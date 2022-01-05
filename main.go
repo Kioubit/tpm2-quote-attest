@@ -3,15 +3,21 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 )
 
 func main() {
 	b, err := ioutil.ReadFile("quote.out")
 	if err != nil {
-		fmt.Print(err)
+		log.Fatal(err.Error())
 	}
-	_, err = MarshalRawQuoteMessage(b)
+
+	result, err := MarshalRawQuoteMessage(b)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Fatal(err.Error())
 	}
+
+	fmt.Println("Digest", result.attested.quote.pcrDigest)
+	fmt.Println("Nonce", result.extraData.data)
+
 }

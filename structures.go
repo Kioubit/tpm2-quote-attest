@@ -6,16 +6,27 @@ import (
 	"errors"
 )
 
-var TPM_MAGIC = []byte{0xff, 0x54, 0x43, 0x47}
+var TPM_GENERATED = []byte{0xff, 0x54, 0x43, 0x47}
 
-func MarshalRawQuoteMessage(rawQuoteMessage []byte) (TPMS_ATTEST, error) {
-	t := TPMS_ATTEST{}
+type TPM_ST []byte
+
+var TPM_ST_ATTEST_QUOTE TPM_ST = []byte{0x80, 0x18}
+
+func MarshalRawQuoteMessage(rawQuoteMessage []byte) (t TPMS_ATTEST, err error) {
+	defer func() {
+		if tErr := recover(); tErr != nil {
+			err = errors.New("panicked")
+		}
+	}()
+
+	t = TPMS_ATTEST{}
+
 	offset := 0
 	progress := 0
 
 	t.magic = rawQuoteMessage[offset : offset+4]
 	offset += 4
-	if !bytes.Equal(t.magic, TPM_MAGIC) {
+	if !bytes.Equal(t.magic, TPM_GENERATED) {
 		return TPMS_ATTEST{}, errors.New("not a tpm signature")
 	}
 
@@ -40,7 +51,7 @@ func MarshalRawQuoteMessage(rawQuoteMessage []byte) (TPMS_ATTEST, error) {
 	t.attested, progress = Marshal_TPMU_ATTEST(rawQuoteMessage[offset:])
 	offset += progress
 
-	return t, nil
+	return
 }
 
 type TPMS_ATTEST struct {
@@ -202,14 +213,4 @@ func Marshal_TPM2B_DIGEST(b []byte) (s TPM2B_DIGEST, progress int) {
 	progress += int(s.size)
 
 	return
-}
-
-type TPM_ST []byte
-
-var TPM_ST_ATTEST_QUOTE TPM_ST = []byte{0x80, 0x18}
-
-type TPM2B_ATTEST struct {
-	size                       uint16 // Size of attestationData.
-	signedAttestationDataBytes []byte // The raw bytes of this is the only signed structure, size is not signed
-	signedAttestationData      TPMS_ATTEST
 }
