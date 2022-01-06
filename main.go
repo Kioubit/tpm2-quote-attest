@@ -1,12 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"crypto"
-	"crypto/rsa"
-	"crypto/sha256"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -56,77 +50,24 @@ func main() {
 	}
 	// ------------------------------------------------------------------------
 
-	err = VerifyRSASignature(pubKeyFile, messageFile, signatureFile)
+	q, err := Attest(pubKeyFile, messageFile, pcrFile, signatureFile, nonceFile, Signature_RSA_PKCS1v15_With_SHA256)
 	if err != nil {
-		log.Fatal(err.Error())
-	} else {
-		fmt.Println("Signature verified")
+		log.Fatal(err)
 	}
 
-	result, err := MarshalRawQuoteMessage(messageFile)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	// check nonce
-	if !bytes.Equal(result.extraData.data, nonceFile) {
-		fmt.Printf("OUR %x\n", nonceFile)
-		fmt.Printf("%x\n", result.extraData.data)
-		log.Fatal("Nonce does not match")
-	}
-
-	pcrSelection := result.attested.quote.pcrSelect.pcrSelections[0]
-
-	if result.attested.quote.pcrSelect.count != 1 {
-		log.Fatal("Selection count of 1 is supported")
-	}
-
-	q, err := ParseValuePcrFileWithList(pcrFile, GetPCRList(pcrSelection), CUSTOM_TPM_ALG{
-		hashSize:  sha256.Size,
-		Algorithm: TPM_ALG_SHA256,
-	})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	err = VerifyQuoteDigest(q, result.attested.quote.pcrDigest.buffer)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	fmt.Printf("Firmware Version: %x\n", result.firmwareVersion)
-	fmt.Printf("Clock: %d\n", result.clockInfo.clock)
-	fmt.Printf("Resetcount: %d\n", result.clockInfo.resetCount)
-	fmt.Printf("Restartcount: %d\n", result.clockInfo.restartCount)
-	fmt.Printf("Safe: %x\n", result.clockInfo.safe)
+	fmt.Printf("Firmware Version: %x\n", q.FirmwareVersion)
+	fmt.Printf("Clock: %d\n", q.Clock)
+	fmt.Printf("Resetcount: %d\n", q.ResetCount)
+	fmt.Printf("Restartcount: %d\n", q.RestartCount)
+	fmt.Printf("Safe: %x\n", q.Safe)
+	fmt.Printf("Qualified Signer Name: %x\n", q.QualifiedSignerName)
 	fmt.Println()
-	fmt.Printf("Nonce Included: %x\n", result.extraData.data)
-	fmt.Printf("Digest verified: %t\n", q.DigestVerified)
-	fmt.Printf("Hash algorithm used: %x\n", q.Algorithm.Algorithm)
+	fmt.Printf("Hash algorithm used: %x\n", q.PCRHashAlgorithm.Algorithm)
 
-	fmt.Printf("Quoted PCRs: %d\n", q.Selection)
+	fmt.Printf("Quoted PCRs: %d\n", q.PCRSelection)
 	fmt.Println("PCRs:")
-	for i := 0; i < len(q.Selection); i++ {
-		fmt.Printf("%d -> %x\n", q.Selection[i], q.Values[q.Selection[i]])
+	for i := 0; i < len(q.PCRSelection); i++ {
+		fmt.Printf("%d -> %x\n", q.PCRSelection[i], q.PCRValues[q.PCRSelection[i]])
 	}
 
-}
-
-func VerifyRSASignature(pemPub []byte, plaintext []byte, sigRaw []byte) error {
-	// PKCS1v15 with sha256
-
-	// Decode PEM public key
-	block, _ := pem.Decode([]byte(pemPub))
-	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return err
-	}
-
-	// Verify signature
-	hashedPlain := sha256.Sum256([]byte(plaintext))
-	err = rsa.VerifyPKCS1v15(pubKey.(*rsa.PublicKey), crypto.SHA256, hashedPlain[:], sigRaw)
-	if err != nil {
-		return err
-	}
-	return nil
 }

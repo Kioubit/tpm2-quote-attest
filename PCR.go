@@ -41,8 +41,11 @@ func hasBit(n uint8, pos uint8) bool {
 }
 
 func ParseValuePcrFileWithList(rawFile []byte, list PCRSelectionList, alg CUSTOM_TPM_ALG) (*PCRQuote, error) {
+	if len(list) == 0 {
+		return nil, errors.New("empty PCR selection")
+	}
 	if len(rawFile)%alg.hashSize != 0 {
-		return nil, errors.New("invalid file or hash Alagorithm mismatch ")
+		return nil, errors.New("invalid file or hash algorithm mismatch")
 	}
 	if len(rawFile)/alg.hashSize != len(list) {
 		return nil, errors.New("file does not match pcr selections in quote")
@@ -79,11 +82,11 @@ func VerifyQuoteDigest(quote *PCRQuote, expectedDigest []byte) error {
 
 	sum := make([]byte, alg.hashSize)
 	if bytes.Equal(alg.Algorithm, TPM_ALG_SHA256) {
-		tsum := sha256.Sum256(tDigest)
-		copy(sum, tsum[:])
+		tSum := sha256.Sum256(tDigest)
+		copy(sum, tSum[:])
 	} else if bytes.Equal(alg.Algorithm, TPM_ALG_SHA1) {
-		tsum := sha1.Sum(tDigest)
-		copy(sum, tsum[:])
+		tSum := sha1.Sum(tDigest)
+		copy(sum, tSum[:])
 	}
 	quote.Digest = sum
 
@@ -100,11 +103,11 @@ func TPMExtend(exising []byte, adding []byte, alg CUSTOM_TPM_ALG) (sum []byte) {
 	concatenated := make([]byte, len(exising)+len(adding))
 	concatenated = append(adding, exising...)
 	if bytes.Equal(alg.Algorithm, TPM_ALG_SHA256) {
-		tsum := sha256.Sum256(concatenated)
-		copy(sum, tsum[:])
+		tSum := sha256.Sum256(concatenated)
+		copy(sum, tSum[:])
 	} else if bytes.Equal(alg.Algorithm, TPM_ALG_SHA1) {
-		tsum := sha1.Sum(concatenated)
-		copy(sum, tsum[:])
+		tSum := sha1.Sum(concatenated)
+		copy(sum, tSum[:])
 	}
 	return
 }
