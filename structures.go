@@ -6,11 +6,23 @@ import (
 	"errors"
 )
 
+// Useful Documentation: https://trustedcomputinggroup.org/wp-content/uploads/TCG_TPM2_r1p59_Part2_Structures_pub.pdf
+
 var TPM_GENERATED = []byte{0xff, 0x54, 0x43, 0x47}
 
 type TPM_ST []byte
 
 var TPM_ST_ATTEST_QUOTE TPM_ST = []byte{0x80, 0x18}
+
+// Custom util struct
+type CUSTOM_TPM_ALG struct {
+	hashSize  int
+	Algorithm TPM_ALG
+}
+type TPM_ALG []byte
+
+var TPM_ALG_SHA256 TPM_ALG = []byte{0x00, 0x0B}
+var TPM_ALG_SHA1 TPM_ALG = []byte{0x00, 0x04}
 
 func MarshalRawQuoteMessage(rawQuoteMessage []byte) (t TPMS_ATTEST, err error) {
 	defer func() {
