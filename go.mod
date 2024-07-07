@@ -1,3 +1,3 @@
 module tpm2-quote-attest
 
-go 1.17
+go 1.22.5
