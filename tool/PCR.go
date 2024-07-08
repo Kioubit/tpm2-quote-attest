@@ -3,13 +3,23 @@ package tool
 import (
 	"bytes"
 	"crypto/subtle"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
 	"io"
 )
 
-type PCRValues map[int][]byte
+type PCRValues map[int]PCRValue
+type PCRValue []byte
+
+func (v PCRValue) String() string {
+	return hex.EncodeToString(v)
+}
+func (v PCRValue) MarshalJSON() ([]byte, error) {
+	return json.Marshal(v.String())
+}
 
 func parseValuePcrFileWithList(rawFile []byte, alg hash.Hash) (PCRValues, error) {
 	if len(rawFile)%alg.Size() != 0 {
@@ -33,7 +43,11 @@ func parseValuePcrFileWithList(rawFile []byte, alg hash.Hash) (PCRValues, error)
 func verifyQuoteDigest(quote PCRValues, expectedDigest []byte, alg hash.Hash) error {
 	concatenated := make([]byte, 0)
 	for i := 0; i < len(quote); i++ {
-		concatenated = append(concatenated, quote[i]...)
+		q, ok := quote[i+1]
+		if !ok {
+			return errors.New("invalid pcr value map")
+		}
+		concatenated = append(concatenated, q...)
 	}
 	alg.Write(concatenated)
 	sum := alg.Sum(nil)
@@ -41,8 +55,7 @@ func verifyQuoteDigest(quote PCRValues, expectedDigest []byte, alg hash.Hash) er
 	if subtle.ConstantTimeCompare(expectedDigest, sum) == 1 {
 		return nil
 	} else {
-		fmt.Printf("%X\n\n%X\n", expectedDigest, sum)
-		return errors.New("quote digest does not match")
+		return fmt.Errorf("quote digest does not match. Expected: %X Got: %X\n", expectedDigest, sum)
 	}
 }
 

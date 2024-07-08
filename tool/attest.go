@@ -84,7 +84,7 @@ func verifySignature(pemPub []byte, plaintext []byte, sigRaw []byte) error {
 	case *rsa.PublicKey:
 		err = rsa.VerifyPKCS1v15(pubKey.(*rsa.PublicKey), crypto.SHA256, hashedPlain[:], sigRaw)
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid signature: %w", err)
 		}
 	case *ecdsa.PublicKey:
 		if !ecdsa.VerifyASN1(pubKey.(*ecdsa.PublicKey), hashedPlain[:], sigRaw) {
