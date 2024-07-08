@@ -33,7 +33,7 @@ func Attest(pemPublicKey []byte, messageFile []byte, pcrFile []byte, signatureFi
 
 	// check nonce
 	if subtle.ConstantTimeCompare(result.TPMData.ExtraData.Data, nonceFile) == 0 {
-		return Attested{}, fmt.Errorf("nonce mismatch. Got %X, wanted %X", result.TPMData.ExtraData.Data, nonceFile)
+		return Attested{}, fmt.Errorf("nonce mismatch. Got %s (%X), wanted %s (%X)", result.TPMData.ExtraData.Data, result.TPMData.ExtraData.Data, nonceFile, nonceFile)
 	}
 
 	if result.TPMData.Attested.Quote.PcrSelect.Count != 1 {
@@ -56,11 +56,11 @@ func Attest(pemPublicKey []byte, messageFile []byte, pcrFile []byte, signatureFi
 		return Attested{}, errors.New("unsupported PCR hash algorithm")
 	}
 
-	q, err := parseValuePcrFileWithList(pcrFile, pcrHashAlgorithm)
+	q, err := parseValuePcrFileWithList(pcrFile, pcrSelection.SelectedPCRs(), pcrHashAlgorithm)
 	if err != nil {
 		return
 	}
-	err = verifyQuoteDigest(q, result.TPMData.Attested.Quote.PcrDigest.Buffer, pcrHashAlgorithm)
+	err = verifyQuoteDigest(q, pcrSelection.SelectedPCRs(), result.TPMData.Attested.Quote.PcrDigest.Buffer, pcrHashAlgorithm)
 	if err != nil {
 		return
 	}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"tpm2-quote-attest/tool"
 )
@@ -14,7 +13,7 @@ func main() {
 	var prettyPrint bool
 	flag.StringVar(&messageFilePath, "message-file", "", "Path to message file")
 	flag.StringVar(&pcrFilePath, "pcr-file", "", "Path to pcr file (in pcrs_format=values)")
-	flag.StringVar(&pubKeyFilePath, "pubKey-file", "", "Path to public key file")
+	flag.StringVar(&pubKeyFilePath, "pubKey-file", "", "Path to public key file (in PEM format)")
 	flag.StringVar(&signatureFilePath, "signature-file", "", "Path to signature file")
 	flag.StringVar(&nonceFilePath, "nonce-file", "", "Path to nonce file")
 	flag.BoolVar(&prettyPrint, "pretty", true, "Pretty-print JSON output (optional)")
@@ -30,33 +29,39 @@ func main() {
 	// ---------------------------- Read Files --------------------------------
 	messageFile, err := os.ReadFile(messageFilePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error reading message file:", err)
+		os.Exit(1)
 	}
 
 	pcrFile, err := os.ReadFile(pcrFilePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error reading pcr file:", err)
+		os.Exit(1)
 	}
 
 	pubKeyFile, err := os.ReadFile(pubKeyFilePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error reading public key file:", err)
+		os.Exit(1)
 	}
 
 	signatureFile, err := os.ReadFile(signatureFilePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error reading signature file:", err)
+		os.Exit(1)
 	}
 
 	nonceFile, err := os.ReadFile(nonceFilePath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error reading nonce file:", err)
+		os.Exit(1)
 	}
 	// ------------------------------------------------------------------------
 
 	q, err := tool.Attest(pubKeyFile, messageFile, pcrFile, signatureFile, nonceFile)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Attestation error:", err)
+		os.Exit(1)
 	}
 
 	var result []byte
@@ -66,7 +71,8 @@ func main() {
 		result, err = json.Marshal(q)
 	}
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	fmt.Println(string(result))
 }

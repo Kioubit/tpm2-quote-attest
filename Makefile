@@ -16,7 +16,7 @@ release-all:
 android:
 	if [ ! -d "bin/" ]; then  mkdir ./bin/ ; fi
 	go install golang.org/x/mobile/cmd/gomobile@latest
-	~/go/bin/gomobile bind -o bin/android.aar -target=android -androidapi 27 ./mobile/
+	gomobile bind -o bin/attest.aar -target=android -androidapi 27 ./mobile/
 
 clean:
 	if [ -d "bin/" ]; then find bin/ -type f -delete ;fi
