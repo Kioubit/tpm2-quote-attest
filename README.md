@@ -55,7 +55,6 @@ user@host:~$ tpm2_quote_attest -message-file data/quote.out -pcr-file data/quote
         }
     },
     "PCRValues": {
-        "0": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
         "1": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
         "2": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
         "3": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
@@ -63,7 +62,8 @@ user@host:~$ tpm2_quote_attest -message-file data/quote.out -pcr-file data/quote
         "5": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
         "6": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
         "7": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
-        "8": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K"
+        "8": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K",
+        "9": "ZXhhbXBsZWV4YW1wbGVleGFtcGxlZXhhbXBsZWV4YW0K"
     }
 }
 ```

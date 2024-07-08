@@ -17,7 +17,7 @@ func main() {
 	flag.StringVar(&pubKeyFilePath, "pubKey-file", "", "Path to public key file")
 	flag.StringVar(&signatureFilePath, "signature-file", "", "Path to signature file")
 	flag.StringVar(&nonceFilePath, "nonce-file", "", "Path to nonce file")
-	flag.BoolVar(&prettyPrint, "pretty", true, "Pretty-print JSON output")
+	flag.BoolVar(&prettyPrint, "pretty", true, "Pretty-print JSON output (optional)")
 	flag.Parse()
 
 	if flag.NFlag() < 5 {

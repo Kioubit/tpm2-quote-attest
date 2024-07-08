@@ -25,7 +25,7 @@ func parseValuePcrFileWithList(rawFile []byte, alg hash.Hash) (PCRValues, error)
 		if err != nil {
 			return nil, err
 		}
-		result[iter] = PCRValue
+		result[iter+1] = PCRValue
 	}
 	return result, nil
 }
