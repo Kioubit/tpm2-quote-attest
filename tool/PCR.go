@@ -66,8 +66,7 @@ func verifyQuoteDigest(quote PCRValues, selectedPCRs []int, expectedDigest []byt
 }
 
 func TPMExtend(exising []byte, adding []byte, alg hash.Hash) []byte {
-	concatenated := make([]byte, len(exising)+len(adding))
-	concatenated = append(adding, exising...)
+	concatenated := append(adding, exising...)
 	alg.Write(concatenated)
 	return alg.Sum(nil)
 }

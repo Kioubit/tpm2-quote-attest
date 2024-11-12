@@ -45,7 +45,6 @@ func (t tpmsPcrSelection) SelectedPCRs() []int {
 		for i = 0; i < 8; i++ {
 			if hasBit(t.PcrSelect[s], i) {
 				list = append(list, int(i)+pcrPos)
-			} else {
 			}
 		}
 		pcrPos += 8

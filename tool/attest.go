@@ -80,14 +80,14 @@ func verifySignature(pemPub []byte, plaintext []byte, sigRaw []byte) error {
 	hashedPlain := sha256.Sum256(plaintext)
 
 	// Validate signature
-	switch pubKey.(type) {
+	switch val := pubKey.(type) {
 	case *rsa.PublicKey:
-		err = rsa.VerifyPKCS1v15(pubKey.(*rsa.PublicKey), crypto.SHA256, hashedPlain[:], sigRaw)
+		err = rsa.VerifyPKCS1v15(val, crypto.SHA256, hashedPlain[:], sigRaw)
 		if err != nil {
 			return fmt.Errorf("invalid signature: %w", err)
 		}
 	case *ecdsa.PublicKey:
-		if !ecdsa.VerifyASN1(pubKey.(*ecdsa.PublicKey), hashedPlain[:], sigRaw) {
+		if !ecdsa.VerifyASN1(val, hashedPlain[:], sigRaw) {
 			return errors.New("invalid signature")
 		}
 	default:
