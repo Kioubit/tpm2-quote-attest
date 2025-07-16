@@ -5,7 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"tpm2-quote-attest/tool"
+
+	tpm2quoteattest "github.com/Kioubit/tpm2-quote-attest"
 )
 
 func main() {
@@ -58,7 +59,7 @@ func main() {
 	}
 	// ------------------------------------------------------------------------
 
-	q, err := tool.Attest(pubKeyFile, messageFile, pcrFile, signatureFile, nonceFile)
+	q, err := tpm2quoteattest.Attest(pubKeyFile, messageFile, pcrFile, signatureFile, nonceFile)
 	if err != nil {
 		fmt.Println("Attestation error:", err)
 		os.Exit(1)
@@ -74,5 +75,6 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	fmt.Println(string(result))
 }

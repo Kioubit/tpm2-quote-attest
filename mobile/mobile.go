@@ -2,11 +2,12 @@ package tpm2_tool_mobile
 
 import (
 	"encoding/json"
-	"tpm2-quote-attest/tool"
+
+	tpm2quoteattest "github.com/Kioubit/tpm2-quote-attest"
 )
 
 func ParseAndValidate(publicKey, message, pcr, signature, nonce []byte) (string, error) {
-	result, err := tool.Attest(publicKey, message, pcr, signature, nonce)
+	result, err := tpm2quoteattest.Attest(publicKey, message, pcr, signature, nonce)
 	if err != nil {
 		return "", err
 	}
