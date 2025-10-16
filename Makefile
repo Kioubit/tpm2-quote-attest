@@ -19,7 +19,8 @@ install:
 
 # Build mobile bindings for Android
 mobile-android:
-	gomobile bind -target=android -o mobile/build/tpm2-tool-mobile.aar ./mobile
+	mkdir mobile/build/ || true
+	gomobile bind -target=android -androidapi 27 -o mobile/build/tpm2-tool-mobile.aar ./mobile
 
 # Build mobile bindings for iOS
 mobile-ios:
