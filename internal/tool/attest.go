@@ -72,6 +72,9 @@ func Attest(pemPublicKey []byte, messageFile []byte, pcrFile []byte, signatureFi
 func verifySignature(pemPub []byte, plaintext []byte, sigRaw []byte) error {
 	// Decode PEM public key
 	block, _ := pem.Decode(pemPub)
+	if block == nil {
+		return errors.New("failed to parse PEM public key")
+	}
 	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return err
